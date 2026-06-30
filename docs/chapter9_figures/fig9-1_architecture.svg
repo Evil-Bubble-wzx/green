@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" style="background:#ffffff">
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.12"/><stop offset="100%" stop-color="#10b981" stop-opacity="0.06"/></linearGradient>
+  </defs>
+  <text x="450" y="35" text-anchor="middle" fill="#1a1a2e" font-size="18" font-weight="bold">图9-1 系统总体架构图</text>
+  <!-- Layer 5: 应用层 -->
+  <rect x="50" y="55" width="800" height="70" rx="10" fill="url(#bg1)" stroke="#0ea5e9" stroke-width="1.5"/>
+  <text x="450" y="82" text-anchor="middle" fill="#0284c7" font-size="15" font-weight="bold">应用层 (Application Layer)</text>
+  <text x="450" y="105" text-anchor="middle" fill="#334155" font-size="11">政府部门 │ 数据中心企业 │ 能源规划部门 │ 区域协调发展 │ 绿色低碳治理 │ 研究人员</text>
+  <!-- Arrow -->
+  <text x="450" y="140" text-anchor="middle" fill="#94a3b8" font-size="20">▲</text>
+  <!-- Layer 4: 可视化层 -->
+  <rect x="50" y="150" width="800" height="80" rx="10" fill="#f0f9ff" stroke="#0284c7" stroke-width="1.5"/>
+  <text x="450" y="177" text-anchor="middle" fill="#0284c7" font-size="15" font-weight="bold">可视化层 (Visualization Layer)</text>
+  <text x="450" y="198" text-anchor="middle" fill="#334155" font-size="11">Next.js │ ECharts │ 中国地图 │ 环形饼图 │ 玫瑰图 │ 雷达图 │ 堆叠柱状图 │ 瀑布图 │ 折线面积图</text>
+  <text x="450" y="216" text-anchor="middle" fill="#475569" font-size="10">深色科技风 · 10个功能模块 · 40+交互式图表 · 响应式布局</text>
+  <!-- Arrow -->
+  <text x="450" y="245" text-anchor="middle" fill="#94a3b8" font-size="20">▲</text>
+  <!-- Layer 3: 服务层 -->
+  <rect x="50" y="255" width="800" height="80" rx="10" fill="#f0fdf4" stroke="#10b981" stroke-width="1.5"/>
+  <text x="450" y="282" text-anchor="middle" fill="#047857" font-size="15" font-weight="bold">服务层 (Service Layer) — FastAPI</text>
+  <text x="450" y="303" text-anchor="middle" fill="#334155" font-size="11">/api/provinces │ /api/scores │ /api/indicators │ /api/dagum │ /api/moran │ /api/markov</text>
+  <text x="450" y="321" text-anchor="middle" fill="#334155" font-size="11">/api/lpa │ /api/obstacles │ /api/shap │ /api/layout │ /api/overview │ /api/chat</text>
+  <!-- Arrow -->
+  <text x="450" y="350" text-anchor="middle" fill="#94a3b8" font-size="20">▲</text>
+  <!-- Layer 2: 模型层 -->
+  <rect x="50" y="360" width="800" height="95" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+  <text x="450" y="387" text-anchor="middle" fill="#b45309" font-size="15" font-weight="bold">模型层 (Model Layer)</text>
+  <text x="450" y="408" text-anchor="middle" fill="#334155" font-size="11">TOPSIS综合评价 │ 熵权法+CRITIC │ Dagum分解 │ Moran's I + LISA │ Markov转移矩阵</text>
+  <text x="450" y="428" text-anchor="middle" fill="#334155" font-size="11">LPA潜在剖面 │ SHAP可解释性 │ XGBoost+RF预测 │ 障碍度诊断 │ RAG检索增强</text>
+  <text x="450" y="446" text-anchor="middle" fill="#475569" font-size="10">DeepSeek大语言模型 · Chroma向量检索 · 规则路由</text>
+  <!-- Arrow -->
+  <text x="450" y="470" text-anchor="middle" fill="#94a3b8" font-size="20">▲</text>
+  <!-- Layer 1: 数据层 -->
+  <rect x="50" y="480" width="800" height="90" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="450" y="507" text-anchor="middle" fill="#6d28d9" font-size="15" font-weight="bold">数据层 (Data Layer) — PostgreSQL</text>
+  <text x="450" y="528" text-anchor="middle" fill="#334155" font-size="11">42张数据表 · 3000+结构化记录 · 2016-2024年 · 31个省级行政区 · 34个二级指标</text>
+  <text x="450" y="548" text-anchor="middle" fill="#475569" font-size="10">指标体系 │ 标准化数据 │ 综合得分 │ 空间分析 │ 诊断解释 │ 布局决策 │ RAG知识库</text>
+</svg>

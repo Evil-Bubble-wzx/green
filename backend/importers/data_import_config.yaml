@@ -1,0 +1,939 @@
+# ============================================================================
+# Green Compute System - Data Import Configuration
+# Auto-generated from data/metadata/data_dictionary.xlsx
+# Maps Excel files in data/raw/ to PostgreSQL tables in green_compute
+# ============================================================================
+
+imports:
+
+  # =========================================================================
+  # 1. Clean Data (raw indicator values)
+  # =========================================================================
+  - table_name: indicator_values
+    file_path: data/raw/clean_data.xlsx
+    sheet_name: clean_data
+    description: 清洗后的原始指标值（31省×9年×34指标）
+    column_mapping:
+      province: 省份
+      year: 年份
+      x01_gdp: GDP（亿元）
+      x02_population: 常住人口（万人)
+      x03_energy_consumption: 能源消费总量
+      x04_co2_emission: CO2排放量（吨）
+      x05_fiber_cable_per_10k: 每万人光缆线路长度
+      x06_5g_base_stations_per_10k: 每万人5G基站数
+      x07_access_ports_per_10k: 每万人接入端口数
+      x08_energy_consumption_per_gdp: 单位GDP能耗
+      x09_renewable_power_share: 可再生能源发电占比（可再生能源电力消纳比重）
+      x10_carbon_intensity: 碳排放强度（吨/万元）
+      x11_it_service_value_added_share: 信息传输、软件和信息技术服务业增加值占GDP比重
+      x12_telecom_business_intensity: 电信业务发展强度
+      x13_labor_productivity: 全员劳动生产率
+      x14_rd_expenditure_intensity: R&D经费投入强度
+      x15_invention_patents_per_10k: 万人发明专利占比
+      x16_high_tech_investment_intensity: 高技术产业投资强度
+      x17_power_capacity_per_10k: 每万人发电装机容量
+      x18_mobile_phone_penetration: 移动电话普及率（部/百人）
+      x19_mobile_internet_penetration: 移动互联网用户普及水平
+      x20_broadband_users_per_10k: 每万人互联网宽带接入用户数
+      x21_avg_temperature: 年平均气温
+      x22_it_employee_share: 信息技术从业人员占比（比值）
+      x23_water_resources_per_capita: 人均水资源量（立方米/人）
+      x24_science_tech_expenditure_share: 科学技术支出占比（比值）
+      x25_electricity_consumption: 全社会用电量（亿千瓦时）
+      x26_electricity_per_capita: 人均全社会用电量（千瓦时/人）
+      x27_industrial_solid_waste_utilization: 一般工业固体废物综合利用率（比值）
+      x28_energy_saving_env_spending_intensity: 节能环保支出强度（比值）
+      x29_tertiary_industry_value_added: 第三产业增加值（亿元）
+      x30_rd_personnel_fte: R&D人员全时当量（人年）
+      x31_green_patent_applications: 绿色专利申请量（件）
+      x32_gov_science_tech_spending: 政府科技支出（亿元）
+      x33_digital_financial_inclusion_index: 数字普惠金融指数（指数）
+      x34_national_compute_hub_code: 国家算力枢纽节点编码（编码）
+    required_fields: [province, year]
+    unique_keys: [province, year]
+    numeric_fields:
+      - x01_gdp
+      - x02_population
+      - x03_energy_consumption
+      - x04_co2_emission
+      - x05_fiber_cable_per_10k
+      - x06_5g_base_stations_per_10k
+      - x07_access_ports_per_10k
+      - x08_energy_consumption_per_gdp
+      - x09_renewable_power_share
+      - x10_carbon_intensity
+      - x11_it_service_value_added_share
+      - x12_telecom_business_intensity
+      - x13_labor_productivity
+      - x14_rd_expenditure_intensity
+      - x15_invention_patents_per_10k
+      - x16_high_tech_investment_intensity
+      - x17_power_capacity_per_10k
+      - x18_mobile_phone_penetration
+      - x19_mobile_internet_penetration
+      - x20_broadband_users_per_10k
+      - x21_avg_temperature
+      - x22_it_employee_share
+      - x23_water_resources_per_capita
+      - x24_science_tech_expenditure_share
+      - x25_electricity_consumption
+      - x26_electricity_per_capita
+      - x27_industrial_solid_waste_utilization
+      - x28_energy_saving_env_spending_intensity
+      - x29_tertiary_industry_value_added
+      - x30_rd_personnel_fte
+      - x31_green_patent_applications
+      - x32_gov_science_tech_spending
+      - x33_digital_financial_inclusion_index
+    integer_fields:
+      - year
+      - x34_national_compute_hub_code
+
+  # =========================================================================
+  # 2. Indicator System Definition (from 表2-1 + data_dictionary)
+  # =========================================================================
+  - table_name: indicator_system
+    file_path: data/raw/表2-1_指标体系.xlsx
+    sheet_name: Sheet1
+    description: 指标体系定义（34个指标、8个维度、指标方向）
+    column_mapping:
+      dimension: 一级维度
+      indicator_name: 指标名称
+      direction: 指标方向
+    # Enrich from data dictionary: match on indicator_name, pull codes + metadata
+    dictionary:
+      path: data/metadata/data_dictionary.xlsx
+      sheet: Sheet3_indicators
+      match_field: indicator_name             # key to join on (must exist in both)
+      fields:                                 # columns to pull from dictionary
+        indicator_code: indicator_code
+        field_name: field_name
+        unit: unit
+        meaning: meaning
+      # direction and dimension already exist in the Excel;
+      # dictionary values act as fallback / override if Excel row is missing them
+    required_fields: [indicator_code, field_name, indicator_name, dimension]
+    unique_keys: [indicator_code]
+    string_fields: [dimension, indicator_name, direction, indicator_code, field_name, unit]
+
+  # =========================================================================
+  # 3. Indicator Values Normalized (from 表3-1)
+  # =========================================================================
+  - table_name: indicator_values_normalized
+    file_path: data/raw/表3-1_标准化数据.xlsx
+    sheet_name: Sheet1
+    description: 标准化后的指标值（31省×9年×34指标）
+    column_mapping:
+      province: 省份
+      year: 年份
+      x01_gdp: GDP（亿元）
+      x02_population: 常住人口（万人)
+      x03_energy_consumption: 能源消费总量
+      x04_co2_emission: CO2排放量（吨）
+      x05_fiber_cable_per_10k: 每万人光缆线路长度
+      x06_5g_base_stations_per_10k: 每万人5G基站数
+      x07_access_ports_per_10k: 每万人接入端口数
+      x08_energy_consumption_per_gdp: 单位GDP能耗
+      x09_renewable_power_share: 可再生能源发电占比（可再生能源电力消纳比重）
+      x10_carbon_intensity: 碳排放强度（吨/万元）
+      x11_it_service_value_added_share: 信息传输、软件和信息技术服务业增加值占GDP比重
+      x12_telecom_business_intensity: 电信业务发展强度
+      x13_labor_productivity: 全员劳动生产率
+      x14_rd_expenditure_intensity: R&D经费投入强度
+      x15_invention_patents_per_10k: 万人发明专利占比
+      x16_high_tech_investment_intensity: 高技术产业投资强度
+      x17_power_capacity_per_10k: 每万人发电装机容量
+      x18_mobile_phone_penetration: 移动电话普及率（部/百人）
+      x19_mobile_internet_penetration: 移动互联网用户普及水平
+      x20_broadband_users_per_10k: 每万人互联网宽带接入用户数
+      x21_avg_temperature: 年平均气温
+      x22_it_employee_share: 信息技术从业人员占比（比值）
+      x23_water_resources_per_capita: 人均水资源量（立方米/人）
+      x24_science_tech_expenditure_share: 科学技术支出占比（比值）
+      x25_electricity_consumption: 全社会用电量（亿千瓦时）
+      x26_electricity_per_capita: 人均全社会用电量（千瓦时/人）
+      x27_industrial_solid_waste_utilization: 一般工业固体废物综合利用率（比值）
+      x28_energy_saving_env_spending_intensity: 节能环保支出强度（比值）
+      x29_tertiary_industry_value_added: 第三产业增加值（亿元）
+      x30_rd_personnel_fte: R&D人员全时当量（人年）
+      x31_green_patent_applications: 绿色专利申请量（件）
+      x32_gov_science_tech_spending: 政府科技支出（亿元）
+      x33_digital_financial_inclusion_index: 数字普惠金融指数（指数）
+      x34_national_compute_hub_code: 国家算力枢纽节点编码（编码）
+    required_fields: [province, year]
+    unique_keys: [province, year]
+    numeric_fields:
+      - x01_gdp
+      - x02_population
+      - x03_energy_consumption
+      - x04_co2_emission
+      - x05_fiber_cable_per_10k
+      - x06_5g_base_stations_per_10k
+      - x07_access_ports_per_10k
+      - x08_energy_consumption_per_gdp
+      - x09_renewable_power_share
+      - x10_carbon_intensity
+      - x11_it_service_value_added_share
+      - x12_telecom_business_intensity
+      - x13_labor_productivity
+      - x14_rd_expenditure_intensity
+      - x15_invention_patents_per_10k
+      - x16_high_tech_investment_intensity
+      - x17_power_capacity_per_10k
+      - x18_mobile_phone_penetration
+      - x19_mobile_internet_penetration
+      - x20_broadband_users_per_10k
+      - x21_avg_temperature
+      - x22_it_employee_share
+      - x23_water_resources_per_capita
+      - x24_science_tech_expenditure_share
+      - x25_electricity_consumption
+      - x26_electricity_per_capita
+      - x27_industrial_solid_waste_utilization
+      - x28_energy_saving_env_spending_intensity
+      - x29_tertiary_industry_value_added
+      - x30_rd_personnel_fte
+      - x31_green_patent_applications
+      - x32_gov_science_tech_spending
+      - x33_digital_financial_inclusion_index
+    integer_fields: [year, x34_national_compute_hub_code]
+
+  # =========================================================================
+  # 4. Indicator Weights (from 表3-2)
+  # =========================================================================
+  - table_name: indicator_weights
+    file_path: data/raw/表3-2_组合权重结果.xlsx
+    sheet_name: Sheet1
+    description: 组合权重结果（熵权法+CRITIC+组合权重）
+    column_mapping:
+      rank: 排名
+      indicator_name: 指标名称
+      dimension: 一级维度
+      indicator_direction: 指标方向
+      entropy_weight: 熵权法权重
+      critic_weight: CRITIC权重
+      combined_weight: 组合权重
+    required_fields: [indicator_name]
+    unique_keys: [indicator_name]
+    numeric_fields: [entropy_weight, critic_weight, combined_weight]
+    integer_fields: [rank]
+
+  # =========================================================================
+  # 5. TOPSIS Scores (from 表3-3)
+  # =========================================================================
+  - table_name: topsis_scores
+    file_path: data/raw/表3-3_绿色算力综合得分(1).xlsx
+    sheet_name: Sheet1
+    description: TOPSIS综合得分与排名（31省×9年）
+    column_mapping:
+      province: 省份
+      year: 年份
+      composite_score: 综合得分
+      rank: 排名
+    required_fields: [province, year]
+    unique_keys: [province, year]
+    numeric_fields: [composite_score]
+    integer_fields: [year, rank]
+
+  # =========================================================================
+  # 6. LPA Results (第4章)
+  # =========================================================================
+  - table_name: lpa_model_fit
+    file_path: data/raw/第4章_LPA结果表(1).xlsx
+    sheet_name: 表4-1模型拟合
+    description: LPA模型拟合统计量
+    column_mapping:
+      class_count: 类别数
+      aic: AIC
+      bic: BIC
+      entropy: Entropy
+      min_class_sample_size: 最小类别样本量
+      class_size: 类别规模
+    required_fields: [class_count]
+    numeric_fields: [aic, bic, entropy]
+    integer_fields: [class_count, min_class_sample_size]
+
+  - table_name: lpa_type_summary
+    file_path: data/raw/第4章_LPA结果表(1).xlsx
+    sheet_name: 表4-2类型汇总
+    description: LPA类型汇总
+    column_mapping:
+      lpa_type: 类型
+      type_name: 类型命名
+      province_count: 省份数量
+      mean_2016: 2016年均值
+      mean_2024: 2024年均值
+      stage_increment: 阶段增量
+      mean_2016_2024: 2016—2024均值
+      province: 省份
+    required_fields: [lpa_type, type_name]
+    numeric_fields: [mean_2016, mean_2024, stage_increment, mean_2016_2024]
+    integer_fields: [province_count]
+
+  - table_name: lpa_province_assignment
+    file_path: data/raw/第4章_LPA结果表(1).xlsx
+    sheet_name: 表4-3省份归属
+    description: LPA省份归属
+    column_mapping:
+      province: 省份
+      lpa_type: LPA类型
+      type_name: 类型命名
+      score_2016: 2016年得分
+      score_2024: 2024年得分
+      stage_increment: 阶段增量
+      mean_2016_2024: 2016—2024均值
+      max_posterior_probability: 最大后验概率
+    required_fields: [province]
+    unique_keys: [province]
+    numeric_fields: [score_2016, score_2024, stage_increment, mean_2016_2024, max_posterior_probability]
+
+  - table_name: lpa_type_trajectory
+    file_path: data/raw/第4章_LPA结果表(1).xlsx
+    sheet_name: 类型均值轨迹
+    description: LPA类型均值轨迹（2016-2024）
+    column_mapping:
+      year: 年份
+      type1_high_leading: 类型1 高位领先型
+      type2_advantage_supporting: 类型2 优势支撑型
+      type3_mid_catching_up: 类型3 中位追赶型
+      type4_basic_cultivating: 类型4 基础培育型
+    required_fields: [year]
+    unique_keys: [year]
+    numeric_fields: [type1_high_leading, type2_advantage_supporting, type3_mid_catching_up, type4_basic_cultivating]
+    integer_fields: [year]
+
+  # =========================================================================
+  # 7. Spatial Evolution (第5章) - Multiple sheets
+  # =========================================================================
+  - table_name: kde_statistics
+    file_path: data/raw/第5章_空间演化分析结果表(1).xlsx
+    sheet_name: KDE统计量
+    description: KDE核密度估计统计量
+    column_mapping:
+      year: 年份
+      mean_value: 均值
+      standard_deviation: 标准差
+      skewness: 偏度
+      kurtosis: 峰度
+      min_value: 最小值
+      max_value: 最大值
+      peak_position: 峰值位置
+      peak_height: 峰值高度
+    required_fields: [year]
+    unique_keys: [year]
+    numeric_fields: [mean_value, standard_deviation, skewness, kurtosis, min_value, max_value, peak_position, peak_height]
+    integer_fields: [year]
+
+  - table_name: dagum_decomposition
+    file_path: data/raw/第5章_空间演化分析结果表(1).xlsx
+    sheet_name: Dagum分解
+    description: Dagum基尼系数分解
+    column_mapping:
+      year: 年份
+      total_gini: 总体基尼系数
+      intra_region_difference: 区域内差异
+      inter_region_net_difference: 区域间净差异
+      hypervariable_density: 超变密度
+      decomposition_sum: 分解项合计
+      intra_region_contribution_rate: 区域内贡献率
+      inter_region_contribution_rate: 区域间贡献率
+      hypervariable_density_contribution_rate: 超变密度贡献率
+    required_fields: [year]
+    unique_keys: [year]
+    numeric_fields: [total_gini, intra_region_difference, inter_region_net_difference, hypervariable_density, decomposition_sum, intra_region_contribution_rate, inter_region_contribution_rate, hypervariable_density_contribution_rate]
+    integer_fields: [year]
+
+  - table_name: dagum_intra_region
+    file_path: data/raw/第5章_空间演化分析结果表(1).xlsx
+    sheet_name: Dagum区域内明细
+    description: Dagum区域内基尼系数明细
+    column_mapping:
+      year: 年份
+      region: 区域
+      sample_size: 样本量
+      mean_value: 均值
+      intra_region_gini: 区域内基尼
+      p_j: p_j
+      s_j: s_j
+    required_fields: [year, region]
+    unique_keys: [year, region]
+    numeric_fields: [mean_value, intra_region_gini, p_j, s_j]
+    integer_fields: [year, sample_size]
+
+  - table_name: dagum_inter_region
+    file_path: data/raw/第5章_空间演化分析结果表(1).xlsx
+    sheet_name: Dagum区域间明细
+    description: Dagum区域间基尼系数明细
+    column_mapping:
+      year: 年份
+      region_pair: 区域组合
+      high_mean_region: 高均值区域
+      low_mean_region: 低均值区域
+      inter_region_gini: 区域间基尼
+      relative_influence_d: 相对影响D
+      net_difference_contribution: 净差异贡献
+      hypervariable_density_contribution: 超变密度贡献
+    required_fields: [year, region_pair]
+    unique_keys: [year, region_pair]
+    numeric_fields: [inter_region_gini, relative_influence_d, net_difference_contribution, hypervariable_density_contribution]
+    integer_fields: [year]
+
+  - table_name: moran_results
+    file_path: data/raw/第5章_空间演化分析结果表(1).xlsx
+    sheet_name: 全局Moran指数
+    description: 全局Moran's I空间自相关
+    column_mapping:
+      year: 年份
+      moran_i: Moran_I
+      two_sided_p_value: 双侧p值
+      positive_p_value: 正向p值
+      permutation_mean: 置换均值
+      permutation_std: 置换标准差
+    required_fields: [year]
+    unique_keys: [year]
+    numeric_fields: [moran_i, two_sided_p_value, positive_p_value, permutation_mean, permutation_std]
+    integer_fields: [year]
+
+  - table_name: lisa_results
+    file_path: data/raw/第5章_空间演化分析结果表(1).xlsx
+    sheet_name: LISA_2024
+    description: LISA局部空间自相关（2024年）
+    column_mapping:
+      province: 省份
+      year: 年份
+      composite_score: 综合得分
+      standardized_score_z: 标准化得分Z
+      spatial_lag_wz: 空间滞后WZ
+      local_moran_i: Local_Moran_I
+      p_value: p值
+      lisa_type: LISA类型
+    required_fields: [province]
+    unique_keys: [province, year]
+    numeric_fields: [composite_score, standardized_score_z, spatial_lag_wz, local_moran_i, p_value]
+    integer_fields: [year]
+
+  - table_name: markov_frequency
+    file_path: data/raw/第5章_空间演化分析结果表(1).xlsx
+    sheet_name: 传统Markov频数
+    description: 传统马尔可夫转移频数矩阵
+    column_mapping:
+      from_state: "Unnamed: 0"      # First column has no header, contains state names
+      to_low_level_count: 低水平
+      to_mid_low_level_count: 中低水平
+      to_mid_high_level_count: 中高水平
+      to_high_level_count: 高水平
+    required_fields: [from_state]
+    unique_keys: [from_state]
+    integer_fields: [to_low_level_count, to_mid_low_level_count, to_mid_high_level_count, to_high_level_count]
+    # NOTE: The first column is unnamed in the Excel; import script renames it to 'from_state'
+
+  - table_name: markov_probability
+    file_path: data/raw/第5章_空间演化分析结果表(1).xlsx
+    sheet_name: 传统Markov概率
+    description: 传统马尔可夫转移概率矩阵
+    column_mapping:
+      from_state: "Unnamed: 0"
+      to_low_level_probability: 低水平
+      to_mid_low_level_probability: 中低水平
+      to_mid_high_level_probability: 中高水平
+      to_high_level_probability: 高水平
+    required_fields: [from_state]
+    unique_keys: [from_state]
+    numeric_fields: [to_low_level_probability, to_mid_low_level_probability, to_mid_high_level_probability, to_high_level_probability]
+    # NOTE: The first column is unnamed in the Excel; import script renames it to 'from_state'
+
+  - table_name: spatial_markov
+    file_path: data/raw/第5章_空间演化分析结果表(1).xlsx
+    sheet_name: 空间Markov长表
+    description: 空间马尔可夫转移矩阵（长表格式）
+    column_mapping:
+      neighborhood_state: 邻域状态
+      from_state: 转移前状态
+      to_state: 转移后状态
+      frequency: 频数
+      probability: 概率
+    required_fields: [neighborhood_state, from_state, to_state]
+    unique_keys: [neighborhood_state, from_state, to_state]
+    numeric_fields: [probability]
+    integer_fields: [frequency]
+
+  - table_name: spatial_lag_state
+    file_path: data/raw/第5章_空间演化分析结果表(1).xlsx
+    sheet_name: 空间滞后状态
+    description: 空间滞后状态（面板数据）
+    column_mapping:
+      province: 省份
+      year: 年份
+      spatial_lag_score: 空间滞后得分
+      neighborhood_state_code: 邻域状态编号
+      neighborhood_state_name: 邻域状态名称
+      current_state: 本期状态
+      next_state: 下期状态
+    required_fields: [province, year]
+    unique_keys: [province, year]
+    numeric_fields: [spatial_lag_score]
+    integer_fields: [year, neighborhood_state_code]
+
+  - table_name: state_thresholds
+    file_path: data/raw/第5章_空间演化分析结果表(1).xlsx
+    sheet_name: 状态划分阈值
+    description: Markov状态划分阈值
+    column_mapping:
+      state: 状态
+      classification_rule: 划分规则
+      threshold_note: 阈值说明
+    required_fields: [state]
+    unique_keys: [state]
+
+  - table_name: adjacency_matrix
+    file_path: data/raw/第5章_空间演化分析结果表(1).xlsx
+    sheet_name: 空间邻接矩阵说明
+    description: 空间邻接矩阵
+    column_mapping:
+      province: 省份
+      adjacent_provinces: 邻接省份
+      adjacent_count: 邻接数量
+      region: 区域
+    required_fields: [province]
+    unique_keys: [province]
+    integer_fields: [adjacent_count]
+
+  # =========================================================================
+  # 8. Obstacle Degree Model Results (第6章)
+  # =========================================================================
+  - table_name: obstacle_national
+    file_path: data/raw/第6章_障碍度模型结果表(1).xlsx
+    sheet_name: 表6-1全国一级维度
+    description: 全国一级维度障碍度
+    column_mapping:
+      year: 年份
+      dimension: 一级维度
+      dimension_obstacle_degree: 一级维度障碍度
+    required_fields: [year, dimension]
+    unique_keys: [year, dimension]
+    numeric_fields: [dimension_obstacle_degree]
+    integer_fields: [year]
+
+  - table_name: obstacle_regional
+    file_path: data/raw/第6章_障碍度模型结果表(1).xlsx
+    sheet_name: 表6-2区域一级维度
+    description: 区域一级维度障碍度
+    column_mapping:
+      region: 区域
+      digital_infrastructure: 数字基础设施
+      computing_demand_base: 算力需求基础
+      energy_supply_capacity: 能源供给能力
+      green_low_carbon_constraint: 绿色低碳约束
+      innovation_talent_support: 创新与人才支撑
+      climate_natural_condition: 气候与自然条件
+      regional_coordination_capacity: 区域协同能力
+    required_fields: [region]
+    unique_keys: [region]
+    numeric_fields: [digital_infrastructure, computing_demand_base, energy_supply_capacity, green_low_carbon_constraint, innovation_talent_support, climate_natural_condition, regional_coordination_capacity]
+
+  - table_name: obstacle_lpa
+    file_path: data/raw/第6章_障碍度模型结果表(1).xlsx
+    sheet_name: 表6-3LPA一级维度
+    description: LPA类型一级维度障碍度
+    column_mapping:
+      lpa_type: LPA类型
+      digital_infrastructure: 数字基础设施
+      computing_demand_base: 算力需求基础
+      energy_supply_capacity: 能源供给能力
+      green_low_carbon_constraint: 绿色低碳约束
+      innovation_talent_support: 创新与人才支撑
+      climate_natural_condition: 气候与自然条件
+      regional_coordination_capacity: 区域协同能力
+    required_fields: [lpa_type]
+    unique_keys: [lpa_type]
+    numeric_fields: [digital_infrastructure, computing_demand_base, energy_supply_capacity, green_low_carbon_constraint, innovation_talent_support, climate_natural_condition, regional_coordination_capacity]
+
+  - table_name: obstacle_province
+    file_path: data/raw/第6章_障碍度模型结果表(1).xlsx
+    sheet_name: 表6-4省份短板诊断
+    description: 省份短板诊断
+    column_mapping:
+      province: 省份
+      region: 区域
+      lpa_type: LPA类型
+      primary_obstacle_dimension: 首要障碍维度
+      primary_obstacle_degree: 首要障碍度
+      secondary_obstacle_dimension: 次要障碍维度
+      secondary_obstacle_degree: 次要障碍度
+      weakness_diagnosis_type: 短板诊断类型
+    required_fields: [province]
+    unique_keys: [province]
+    numeric_fields: [primary_obstacle_degree, secondary_obstacle_degree]
+
+  - table_name: obstacle_indicator
+    file_path: data/raw/第6章_障碍度模型结果表(1).xlsx
+    sheet_name: 表6-5二级指标障碍度
+    description: 二级指标障碍度排名
+    column_mapping:
+      indicator_name: 指标名称
+      dimension: 一级维度
+      secondary_indicator_obstacle_degree: 二级指标障碍度
+    required_fields: [indicator_name]
+    numeric_fields: [secondary_indicator_obstacle_degree]
+
+  - table_name: obstacle_annual_evolution
+    file_path: data/raw/第6章_障碍度模型结果表(1).xlsx
+    sheet_name: 表6-6年度演化
+    description: 一级维度障碍度年度演化（2016-2024）
+    column_mapping:
+      dimension: 一级维度
+      year_2016: 2016
+      year_2017: 2017
+      year_2018: 2018
+      year_2019: 2019
+      year_2020: 2020
+      year_2021: 2021
+      year_2022: 2022
+      year_2023: 2023
+      year_2024: 2024
+    required_fields: [dimension]
+    unique_keys: [dimension]
+    numeric_fields: [year_2016, year_2017, year_2018, year_2019, year_2020, year_2021, year_2022, year_2023, year_2024]
+    # NOTE: Column headers in Excel are integers (2016, 2017, ...). Import script handles this.
+
+  - table_name: obstacle_province_indicator_detail
+    file_path: data/raw/第6章_障碍度模型结果表(1).xlsx
+    sheet_name: 表6-7省份指标明细2024
+    description: 2024年省份指标级障碍度明细
+    column_mapping:
+      province: 省份
+      year: 年份
+      indicator_name: 指标名称
+      dimension: 一级维度
+      standardized_value: 标准化值
+      target_gap: 目标差距
+      combined_weight: 组合权重
+      weighted_target_gap: 加权目标差距
+      secondary_indicator_obstacle_degree: 二级指标障碍度
+      region: 区域
+      lpa_type: LPA类型
+    required_fields: [province, indicator_name]
+    numeric_fields: [standardized_value, target_gap, combined_weight, weighted_target_gap, secondary_indicator_obstacle_degree]
+    integer_fields: [year]
+
+  # =========================================================================
+  # 9. SHAP Interpretation Results (第7章)
+  # =========================================================================
+  - table_name: shap_model_metrics
+    file_path: data/raw/第7章_SHAP解释分析结果表(1).xlsx
+    sheet_name: 表7-1模型检验
+    description: 模型性能检验（XGBoost/RandomForest）
+    column_mapping:
+      model_name: 模型
+      test_year: 测试年份
+      r2: R2
+      rmse: RMSE
+      mae: MAE
+      mse: MSE
+    required_fields: [model_name]
+    unique_keys: [model_name, test_year]
+    numeric_fields: [r2, rmse, mae, mse]
+    integer_fields: [test_year]
+
+  - table_name: shap_predictions
+    file_path: data/raw/第7章_SHAP解释分析结果表(1).xlsx
+    sheet_name: 表7-2预测结果
+    description: 模型预测结果（2024年）
+    column_mapping:
+      province: 省份
+      year: 年份
+      composite_score: 综合得分
+      rank: 排名
+      lpa_type: LPA类型
+      type_name: 类型命名
+      predicted_composite_score: 预测综合得分
+      prediction_error: 预测误差
+      absolute_error: 绝对误差
+      error_direction: 误差方向
+    required_fields: [province]
+    unique_keys: [province, year]
+    numeric_fields: [composite_score, predicted_composite_score, prediction_error, absolute_error]
+    integer_fields: [year, rank]
+
+  - table_name: shap_importance
+    file_path: data/raw/第7章_SHAP解释分析结果表(1).xlsx
+    sheet_name: 表7-3SHAP重要性
+    description: 全局SHAP特征重要性
+    column_mapping:
+      indicator_name: 指标名称
+      indicator_short_name: 指标简称
+      dimension: 一级维度
+      dimension_short_name: 一级维度简称
+      combined_weight: 组合权重
+      mean_abs_shap_value: 平均绝对SHAP值
+      mean_shap_value: 平均SHAP值
+      importance_rank: 重要性排名
+    required_fields: [indicator_name]
+    numeric_fields: [combined_weight, mean_abs_shap_value, mean_shap_value]
+    integer_fields: [importance_rank]
+
+  - table_name: shap_annual_dimension_contribution
+    file_path: data/raw/第7章_SHAP解释分析结果表(1).xlsx
+    sheet_name: 表7-4年度维度贡献
+    description: SHAP年度维度贡献
+    column_mapping:
+      year: 年份
+      innovation_talent_support: 创新与人才支撑
+      digital_infrastructure: 数字基础设施
+      energy_supply_capacity: 能源供给能力
+      regional_coordination_capacity: 区域协同能力
+      climate_natural_condition: 气候与自然条件
+      computing_demand_base: 算力需求基础
+      green_low_carbon_constraint: 绿色低碳约束
+    required_fields: [year]
+    unique_keys: [year]
+    numeric_fields: [innovation_talent_support, digital_infrastructure, energy_supply_capacity, regional_coordination_capacity, climate_natural_condition, computing_demand_base, green_low_carbon_constraint]
+    integer_fields: [year]
+
+  - table_name: shap_lpa_dimension_contribution
+    file_path: data/raw/第7章_SHAP解释分析结果表(1).xlsx
+    sheet_name: 表7-5LPA维度贡献
+    description: SHAP LPA类型维度贡献
+    column_mapping:
+      type_name: 类型命名
+      innovation_talent_support: 创新与人才支撑
+      digital_infrastructure: 数字基础设施
+      energy_supply_capacity: 能源供给能力
+      regional_coordination_capacity: 区域协同能力
+      climate_natural_condition: 气候与自然条件
+      computing_demand_base: 算力需求基础
+      green_low_carbon_constraint: 绿色低碳约束
+    required_fields: [type_name]
+    unique_keys: [type_name]
+    numeric_fields: [innovation_talent_support, digital_infrastructure, energy_supply_capacity, regional_coordination_capacity, climate_natural_condition, computing_demand_base, green_low_carbon_constraint]
+
+  - table_name: shap_province_summary
+    file_path: data/raw/第7章_SHAP解释分析结果表(1).xlsx
+    sheet_name: 表7-6省份SHAP汇总
+    description: 省份SHAP值汇总（2024年）
+    column_mapping:
+      province: 省份
+      year: 年份
+      composite_score: 综合得分
+      rank: 排名
+      lpa_type: LPA类型
+      type_name: 类型命名
+      predicted_composite_score: 预测综合得分
+      prediction_error: 预测误差
+      absolute_error: 绝对误差
+      error_direction: 误差方向
+      positive_contribution_sum: 正向贡献合计
+      negative_contribution_sum: 负向贡献合计
+      base_value: 基准值
+    required_fields: [province]
+    unique_keys: [province, year]
+    numeric_fields: [composite_score, predicted_composite_score, prediction_error, absolute_error, positive_contribution_sum, negative_contribution_sum, base_value]
+    integer_fields: [year, rank]
+
+  - table_name: shap_local_top8
+    file_path: data/raw/第7章_SHAP解释分析结果表(1).xlsx
+    sheet_name: 表7-7省份局部解释Top8
+    description: 省份局部SHAP Top8解释
+    column_mapping:
+      province: 省份
+      indicator_name: 指标名称
+      indicator_short_name: 指标简称
+      dimension: 一级维度
+      shap_value: SHAP值
+      abs_shap_value: 绝对SHAP值
+    required_fields: [province, indicator_name]
+    numeric_fields: [shap_value, abs_shap_value]
+
+  # =========================================================================
+  # 10. Layout Decision Results (第8章)
+  # =========================================================================
+  - table_name: layout_province_decision
+    file_path: data/raw/第8章_布局决策结果表.xlsx
+    sheet_name: 表8-1省份布局决策
+    description: 省份布局决策
+    column_mapping:
+      province: 省份
+      region: 区域
+      rank: 排名
+      composite_score: 综合得分
+      stage_increment: 阶段增量
+      type_name: 类型命名
+      lisa_type: LISA类型
+      primary_obstacle_dimension: 首要障碍维度
+      secondary_obstacle_dimension: 次要障碍维度
+      weakness_diagnosis_type: 短板诊断类型
+      demand_network_advantage_index: 需求网络优势指数
+      energy_low_carbon_advantage_index: 能源低碳优势指数
+      constraint_pressure_index: 约束压力指数
+      suitability_index: 综合适宜度指数
+      recommended_layout_type: 推荐布局类型
+      layout_orientation: 布局导向
+      functional_positioning: 功能定位
+      optimization_strategy: 优化策略
+      risk_warning: 风险提示
+    required_fields: [province]
+    unique_keys: [province]
+    numeric_fields: [composite_score, stage_increment, demand_network_advantage_index, energy_low_carbon_advantage_index, constraint_pressure_index, suitability_index]
+    integer_fields: [rank]
+
+  - table_name: layout_type_summary
+    file_path: data/raw/第8章_布局决策结果表.xlsx
+    sheet_name: 表8-2类型汇总
+    description: 布局类型汇总
+    column_mapping:
+      recommended_layout_type: 推荐布局类型
+      province_count: 省份数量
+      avg_composite_score: 平均综合得分
+      avg_rank: 平均排名
+      avg_suitability_index: 平均综合适宜度指数
+      demand_network_advantage_index: 需求网络优势指数
+      energy_low_carbon_advantage_index: 能源低碳优势指数
+      avg_primary_obstacle_degree: 平均首要障碍度
+      province: 省份
+    required_fields: [recommended_layout_type]
+    unique_keys: [recommended_layout_type]
+    numeric_fields: [avg_composite_score, avg_rank, avg_suitability_index, demand_network_advantage_index, energy_low_carbon_advantage_index, avg_primary_obstacle_degree]
+    integer_fields: [province_count]
+
+  - table_name: layout_type_features
+    file_path: data/raw/第8章_布局决策结果表.xlsx
+    sheet_name: 表8-3类型特征均值
+    description: 布局类型特征均值
+    column_mapping:
+      recommended_layout_type: 推荐布局类型
+      avg_composite_score: 平均综合得分
+      avg_suitability_index: 平均综合适宜度指数
+      demand_network_advantage_index: 需求网络优势指数
+      energy_low_carbon_advantage_index: 能源低碳优势指数
+      avg_primary_obstacle_degree: 平均首要障碍度
+    required_fields: [recommended_layout_type]
+    unique_keys: [recommended_layout_type]
+    numeric_fields: [avg_composite_score, avg_suitability_index, demand_network_advantage_index, energy_low_carbon_advantage_index, avg_primary_obstacle_degree]
+
+  - table_name: layout_lpa_matrix
+    file_path: data/raw/第8章_布局决策结果表.xlsx
+    sheet_name: 表8-4LPA转布局矩阵
+    description: LPA类型到布局类型的映射矩阵
+    column_mapping:
+      type_name: 类型命名
+      high_suitability_comprehensive_zone: 高适宜综合承载区
+      demand_network_driven_zone: 需求网络驱动区
+      energy_low_carbon_advantage_zone: 能源低碳优势承接区
+      comprehensive_potential_improvement_zone: 综合潜力提升区
+      constraint_control_zone: 约束控制区
+    required_fields: [type_name]
+    unique_keys: [type_name]
+    integer_fields: [high_suitability_comprehensive_zone, demand_network_driven_zone, energy_low_carbon_advantage_zone, comprehensive_potential_improvement_zone, constraint_control_zone]
+
+  - table_name: layout_strategy_library
+    file_path: data/raw/第8章_布局决策结果表.xlsx
+    sheet_name: 表8-5策略库
+    description: 布局策略库
+    column_mapping:
+      recommended_layout_type: 推荐布局类型
+      layout_orientation: 布局导向
+      functional_positioning: 功能定位
+      optimization_strategy: 优化策略
+      risk_warning: 风险提示
+    required_fields: [recommended_layout_type]
+    unique_keys: [recommended_layout_type]
+
+  - table_name: layout_strategy_priority
+    file_path: data/raw/第8章_布局决策结果表.xlsx
+    sheet_name: 表8-6策略优先级
+    description: 布局策略优先级评分
+    column_mapping:
+      recommended_layout_type: 推荐布局类型
+      new_computing_layout_priority: 新增算力布局
+      green_energy_coordination_priority: 绿色能源协同
+      network_channel_strengthening_priority: 网络通道强化
+      industrial_demand_cultivation_priority: 产业需求培育
+      existing_energy_saving_retrofit_priority: 存量节能改造
+      innovation_talent_support_priority: 创新人才支撑
+    required_fields: [recommended_layout_type]
+    unique_keys: [recommended_layout_type]
+    integer_fields: [new_computing_layout_priority, green_energy_coordination_priority, network_channel_strengthening_priority, industrial_demand_cultivation_priority, existing_energy_saving_retrofit_priority, innovation_talent_support_priority]
+
+# ============================================================================
+# Province name standardization mapping
+# ============================================================================
+province_standardization:
+  内蒙古自治区: 内蒙古
+  广西壮族自治区: 广西
+  西藏自治区: 西藏
+  宁夏回族自治区: 宁夏
+  新疆维吾尔自治区: 新疆
+  # NOTE: Most province names in data are already standard short form.
+  # Add more mappings here if data contains long-form names.
+
+# ============================================================================
+# Region standardization mapping
+# ============================================================================
+region_mapping:
+  北京: 东部
+  天津: 东部
+  河北: 东部
+  上海: 东部
+  江苏: 东部
+  浙江: 东部
+  福建: 东部
+  山东: 东部
+  广东: 东部
+  海南: 东部
+  山西: 中部
+  安徽: 中部
+  江西: 中部
+  河南: 中部
+  湖北: 中部
+  湖南: 中部
+  内蒙古: 西部
+  广西: 西部
+  重庆: 西部
+  四川: 西部
+  贵州: 西部
+  云南: 西部
+  西藏: 西部
+  陕西: 西部
+  甘肃: 西部
+  青海: 西部
+  宁夏: 西部
+  新疆: 西部
+  辽宁: 东北
+  吉林: 东北
+  黑龙江: 东北
+
+# ============================================================================
+# Hub province mapping (国家算力枢纽节点)
+# ============================================================================
+hub_provinces:
+  # Verified from clean_data.xlsx: provinces where x34_national_compute_hub_code > 0
+  # 14 hub provinces as encoded in the data:
+  - 上海
+  - 内蒙古
+  - 北京
+  - 四川
+  - 天津
+  - 宁夏
+  - 安徽
+  - 广东
+  - 江苏
+  - 河北
+  - 浙江
+  - 甘肃
+  - 贵州
+  - 重庆
+  # x34 field: 0=非枢纽, 1=枢纽节点
+  # Non-hub provinces (x34=0): 云南, 吉林, 山东, 山西, 广西, 新疆, 江西, 河南, 海南, 湖北, 湖南, 福建, 西藏, 辽宁, 陕西, 青海, 黑龙江
+
+# ============================================================================
+# Year validation range
+# ============================================================================
+year_range:
+  min: 2016
+  max: 2024
+
+# ============================================================================
+# Import mode (append | replace)
+# ============================================================================
+import_mode: append

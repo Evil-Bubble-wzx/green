@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200" style="background:#ffffff">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="8" refX="12" refY="4" orient="auto">
+      <polygon points="0 0, 12 4, 0 8" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" fill="#1a1a2e" font-size="20" font-weight="bold">图9-2 数据处理与模型分析流程图</text>
+
+  <!-- ====== ① 原始数据 ====== -->
+  <rect x="160" y="70" width="480" height="80" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" fill="#6d28d9" font-size="18" font-weight="bold">① 原始数据</text>
+  <text x="400" y="128" text-anchor="middle" fill="#334155" font-size="14">10个 Excel 文件 · 31省 × 9年 × 34指标 · 多源统计年鉴</text>
+  <line x1="400" y1="150" x2="400" y2="180" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- ====== ② 数据清洗 ====== -->
+  <rect x="160" y="183" width="480" height="80" rx="10" fill="#f0f9ff" stroke="#0284c7" stroke-width="2"/>
+  <text x="400" y="213" text-anchor="middle" fill="#0369a1" font-size="18" font-weight="bold">② 数据清洗与标准化</text>
+  <text x="400" y="241" text-anchor="middle" fill="#334155" font-size="14">空值填充 · 异常值处理 · 极差标准化 · 省份与区域名称统一</text>
+  <line x1="400" y1="263" x2="400" y2="293" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- ====== ③ 权重计算 ====== -->
+  <rect x="160" y="296" width="480" height="80" rx="10" fill="#f0fdf4" stroke="#059669" stroke-width="2"/>
+  <text x="400" y="326" text-anchor="middle" fill="#047857" font-size="18" font-weight="bold">③ 组合权重计算</text>
+  <text x="400" y="354" text-anchor="middle" fill="#334155" font-size="14">熵权法（反映数据离散度）+ CRITIC 法（考虑对比强度与冲突性）→ 组合权重</text>
+  <line x1="400" y1="376" x2="400" y2="406" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- ====== ④ TOPSIS ====== -->
+  <rect x="160" y="409" width="480" height="80" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+  <text x="400" y="439" text-anchor="middle" fill="#b45309" font-size="18" font-weight="bold">④ TOPSIS 综合评价</text>
+  <text x="400" y="467" text-anchor="middle" fill="#334155" font-size="14">逼近理想解排序 → 31 省综合得分（0–1 标准化）+ 年度排名</text>
+  <line x1="400" y1="489" x2="400" y2="519" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- ====== ⑤ 多维分析链 ====== -->
+  <rect x="100" y="522" width="600" height="90" rx="10" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+  <text x="400" y="554" text-anchor="middle" fill="#0e7490" font-size="18" font-weight="bold">⑤ 多维分析链（并行执行）</text>
+  <text x="400" y="578" text-anchor="middle" fill="#334155" font-size="14">Dagum 区域差异分解</text>
+  <text x="400" y="598" text-anchor="middle" fill="#334155" font-size="14">Moran's I + LISA 空间自相关分析</text>
+  <text x="400" y="618" text-anchor="middle" fill="#334155" font-size="14">Markov 转移矩阵 + 空间 Markov 模型</text>
+  <line x1="400" y1="612" x2="400" y2="647" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- ====== ⑥ 诊断解释 ====== -->
+  <rect x="160" y="650" width="480" height="80" rx="10" fill="#fdf2f8" stroke="#db2777" stroke-width="2"/>
+  <text x="400" y="680" text-anchor="middle" fill="#be185d" font-size="18" font-weight="bold">⑥ 诊断与解释</text>
+  <text x="400" y="708" text-anchor="middle" fill="#334155" font-size="14">LPA 潜在剖面类型识别 · 障碍度诊断 · SHAP 特征贡献解释</text>
+  <line x1="400" y1="730" x2="400" y2="760" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- ====== ⑦ 布局决策 ====== -->
+  <rect x="160" y="763" width="480" height="80" rx="10" fill="#f0fdf4" stroke="#059669" stroke-width="2.5"/>
+  <text x="400" y="793" text-anchor="middle" fill="#047857" font-size="18" font-weight="bold">⑦ 布局决策</text>
+  <text x="400" y="821" text-anchor="middle" fill="#334155" font-size="14">需求网络优势指数 · 能源低碳优势指数 · 综合适宜度 → 5 种布局类型推荐</text>
+  <line x1="400" y1="843" x2="400" y2="878" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- ====== 输出：数据库 ====== -->
+  <rect x="160" y="881" width="480" height="65" rx="10" fill="#1a1a2e" stroke="#1a1a2e" stroke-width="2"/>
+  <text x="400" y="910" text-anchor="middle" fill="#ffffff" font-size="18" font-weight="bold">PostgreSQL 数据库 — 42 张数据表 · 3000+ 条结构化记录</text>
+  <text x="400" y="933" text-anchor="middle" fill="#94a3b8" font-size="13">8 大类：基础信息 → 核心数据 → LPA → 空间演化 → 障碍度 → SHAP → 布局决策 → 知识库</text>
+
+  <!-- ====== 底部三栏说明 ====== -->
+
+  <!-- 数据层 -->
+  <rect x="16" y="978" width="248" height="200" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="16" y="978" width="248" height="38" rx="8" fill="#f5f3ff"/>
+  <rect x="16" y="1006" width="248" height="10" fill="#f5f3ff"/>
+  <text x="140" y="1003" text-anchor="middle" fill="#6d28d9" font-size="16" font-weight="bold">数据层详情</text>
+  <text x="32" y="1040" fill="#334155" font-size="14">▪ 表 2-1 指标体系</text>
+  <text x="40" y="1060" fill="#475569" font-size="12">34 个指标 × 8 个维度</text>
+  <text x="32" y="1088" fill="#334155" font-size="14">▪ 表 3-1 标准化数据</text>
+  <text x="40" y="1108" fill="#475569" font-size="12">31 省 × 9 年 × 34 指标</text>
+  <text x="32" y="1136" fill="#334155" font-size="14">▪ 表 3-2 组合权重</text>
+  <text x="40" y="1156" fill="#475569" font-size="12">熵权 + CRITIC 组合赋权</text>
+  <text x="32" y="1178" fill="#475569" font-size="12">10 个 Excel → 42 张 PG 表</text>
+
+  <!-- 模型层 -->
+  <rect x="276" y="978" width="248" height="200" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="276" y="978" width="248" height="38" rx="8" fill="#f0f9ff"/>
+  <rect x="276" y="1006" width="248" height="10" fill="#f0f9ff"/>
+  <text x="400" y="1003" text-anchor="middle" fill="#0369a1" font-size="16" font-weight="bold">模型分析链详情</text>
+  <text x="292" y="1038" fill="#334155" font-size="13">▪ 权重：熵权法 + CRITIC</text>
+  <text x="292" y="1062" fill="#334155" font-size="13">▪ TOPSIS：逼近理想解排序</text>
+  <text x="292" y="1086" fill="#334155" font-size="13">▪ Dagum：区域内+区间+超变密度</text>
+  <text x="292" y="1110" fill="#334155" font-size="13">▪ Moran + LISA：全局 I + 局部聚集</text>
+  <text x="292" y="1134" fill="#334155" font-size="13">▪ Markov：传统 + 空间双模型</text>
+  <text x="292" y="1158" fill="#334155" font-size="13">▪ LPA：4 种发展类型聚类</text>
+  <text x="292" y="1178" fill="#334155" font-size="13">▪ SHAP：XGBoost + RF 可解释性</text>
+
+  <!-- 应用层 -->
+  <rect x="536" y="978" width="248" height="200" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="536" y="978" width="248" height="38" rx="8" fill="#f0fdf4"/>
+  <rect x="536" y="1006" width="248" height="10" fill="#f0fdf4"/>
+  <text x="660" y="1003" text-anchor="middle" fill="#047857" font-size="16" font-weight="bold">应用与决策输出</text>
+  <text x="552" y="1038" fill="#334155" font-size="13">▪ 综合得分排名 → 首页总览</text>
+  <text x="552" y="1062" fill="#334155" font-size="13">▪ 区域差异分解 → 区域差异页</text>
+  <text x="552" y="1086" fill="#334155" font-size="13">▪ 空间聚集模式 → 中国地图</text>
+  <text x="552" y="1110" fill="#334155" font-size="13">▪ 动态演化 → Markov 时序</text>
+  <text x="552" y="1134" fill="#334155" font-size="13">▪ 省域诊断 → 障碍因素画像</text>
+  <text x="552" y="1158" fill="#334155" font-size="13">▪ 类型识别 → LPA 4 类分类</text>
+  <text x="552" y="1178" fill="#334155" font-size="13">▪ 智能问答 → RAG + DeepSeek</text>
+</svg>
